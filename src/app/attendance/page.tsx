@@ -59,7 +59,7 @@ export default function AttendancePage() {
       </div>
 
       <Tabs defaultValue="theory" className="space-y-4">
-        <TabsList>
+        <TabsList className="flex w-full overflow-x-auto justify-start md:justify-center">
           <TabsTrigger value="theory">Theory</TabsTrigger>
           <TabsTrigger value="practical">Practical</TabsTrigger>
         </TabsList>
@@ -101,8 +101,8 @@ function AttendanceCourseSelector({ courses }: { courses: Course[] }) {
     return (
          <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl">
-              <div>
-                <Label htmlFor="class-select">Select Class</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="class-select" className="text-sm font-medium">Select Class</Label>
                 <Select onValueChange={setSelectedClass} value={selectedClass || ""}>
                   <SelectTrigger id="class-select">
                     <SelectValue placeholder="Select a class..." />
@@ -116,8 +116,8 @@ function AttendanceCourseSelector({ courses }: { courses: Course[] }) {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="course-select">Select Course</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="course-select" className="text-sm font-medium">Select Course</Label>
                 <Select onValueChange={setSelectedCourseId} value={selectedCourseId || ""} disabled={!selectedClass}>
                     <SelectTrigger id="course-select">
                     <SelectValue placeholder="Select a course..." />
@@ -219,15 +219,16 @@ function AttendanceContent({ course, selectedClass, onStudentsImported }: { cour
         date: lectureDate,
         timeSlot: lectureTimeSlot,
         attendance: attendanceArray,
+        facultyName: user?.name,
+        facultyId: user?.id
     };
     
     saveAttendanceReport(report);
 
     const notifications: Notification[] = attendanceArray.map(att => {
-        const studentUser = allUsers.find(u => u.id === att.studentId);
         const status = att.isPresent ? 'Present' : 'Absent';
         const formattedDate = format(new Date(lectureDate), 'PPP');
-        const message = `Attendance marked for ${course.name}: You were ${status} on ${formattedDate} (${lectureTimeSlot}). Marked by ${course.facultyName}.`;
+        const message = `Attendance marked for ${course.name}: You were ${status} on ${formattedDate} (${lectureTimeSlot}). Marked by ${user?.name}.`;
         
         return {
             id: `notif-${Date.now()}-${att.studentId}`,
@@ -235,6 +236,7 @@ function AttendanceContent({ course, selectedClass, onStudentsImported }: { cour
             message: message,
             timestamp: new Date().toISOString(),
             isRead: false,
+            type: 'attendance_alert'
         };
     });
     saveNotifications(notifications);
@@ -269,22 +271,22 @@ function AttendanceContent({ course, selectedClass, onStudentsImported }: { cour
   
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>{course.name}</CardTitle>
-              <CardDescription>
-                  Class: {selectedClass} | Course Code: {course.courseCode}
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
-                <AddStudentDialog selectedClass={selectedClass} onStudentAdded={onStudentsImported} />
-                <ImportStudentsDialog course={course} selectedClass={selectedClass} onStudentsImported={onStudentsImported} />
-            </div>
+      <CardHeader className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div>
+          <CardTitle>{course.name}</CardTitle>
+          <CardDescription>
+              Class: {selectedClass} | {course.courseCode}
+          </CardDescription>
         </div>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg">
-          <div>
-              <Label htmlFor="lecture-date">Lecture Date</Label>
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+            <AddStudentDialog selectedClass={selectedClass} onStudentAdded={onStudentsImported} />
+            <ImportStudentsDialog course={course} selectedClass={selectedClass} onStudentsImported={onStudentsImported} />
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
+          <div className="space-y-1.5">
+              <Label htmlFor="lecture-date" className="text-sm font-medium">Lecture Date</Label>
               <Input 
                 id="lecture-date"
                 type="date" 
@@ -292,8 +294,8 @@ function AttendanceContent({ course, selectedClass, onStudentsImported }: { cour
                 onChange={(e) => setLectureDate(e.target.value)}
               />
           </div>
-          <div>
-            <Label htmlFor="time-slot-select">Time Slot</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="time-slot-select" className="text-sm font-medium">Time Slot</Label>
             <Select onValueChange={setLectureTimeSlot} value={lectureTimeSlot}>
                 <SelectTrigger id="time-slot-select">
                 <SelectValue placeholder="Select a time slot..." />
@@ -308,24 +310,32 @@ function AttendanceContent({ course, selectedClass, onStudentsImported }: { cour
             </Select>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        {classStudents.length > 0 ? (
-          <AttendanceSheet
-            students={classStudents}
-            attendance={currentAttendance}
-            onAttendanceChange={handleAttendanceChange}
-            onSelectAll={handleSelectAll}
-          />
-        ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>No students found for class {selectedClass}.</p>
-            <p className="text-sm">You can import or add students using the buttons above.</p>
-          </div>
-        )}
-        <div className="flex justify-end gap-2 mt-4">
-            {currentAttendance.size > 0 && <SmartReviewDialog input={getSmartReviewInput()} />}
-            <Button onClick={handleSubmit} disabled={classStudents.length === 0}>Submit Attendance</Button>
+
+        <div>
+          {classStudents.length > 0 ? (
+            <AttendanceSheet
+              students={classStudents}
+              attendance={currentAttendance}
+              onAttendanceChange={handleAttendanceChange}
+              onSelectAll={handleSelectAll}
+            />
+          ) : (
+            <div className="text-center py-12 border-2 border-dashed rounded-lg bg-muted/50">
+              <p className="text-muted-foreground font-medium">No students found for class {selectedClass}.</p>
+              <p className="text-sm text-muted-foreground mt-1">You can import or add students using the buttons above.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+            {currentAttendance.size > 0 && (
+              <div className="w-full sm:w-auto">
+                <SmartReviewDialog input={getSmartReviewInput()} />
+              </div>
+            )}
+            <Button onClick={handleSubmit} disabled={classStudents.length === 0} className="w-full sm:w-auto">
+              Submit Attendance
+            </Button>
         </div>
       </CardContent>
     </Card>
@@ -360,23 +370,71 @@ function ImportStudentsDialog({ course, selectedClass, onStudentsImported }: { c
                 const worksheet = workbook.Sheets[sheetName];
                 const json = XLSX.utils.sheet_to_json<any>(worksheet);
 
-                if (json.length > 0 && 'rollNumber' in json[0] && 'name' in json[0]) {
-                    const newStudents = json.map(item => ({
-                        rollNumber: String(item.rollNumber),
-                        name: String(item.name),
-                    }));
-                    
+                if (json.length === 0) {
+                    toast({ variant: 'destructive', title: 'Empty File', description: 'No student records found in the Excel/CSV file.' });
+                    return;
+                }
+
+                // Helper to match column names for rollNumber/ID in a case-insensitive, space-flexible way
+                const findRollNumberKey = (row: any): string | null => {
+                    const keys = Object.keys(row);
+                    const patterns = [/roll/i, /rno/i, /id/i, /reg/i, /admission/i, /number/i, /serial/i, /sl/i, /enroll/i];
+                    for (const pattern of patterns) {
+                        const matched = keys.find(k => pattern.test(k));
+                        if (matched) return matched;
+                    }
+                    return null;
+                };
+
+                // Helper to match column names for student names in a case-insensitive, space-flexible way
+                const findNameKey = (row: any): string | null => {
+                    const keys = Object.keys(row);
+                    const patterns = [/name/i, /student/i, /full/i, /fname/i, /candidate/i];
+                    for (const pattern of patterns) {
+                        const matched = keys.find(k => pattern.test(k));
+                        if (matched) return matched;
+                    }
+                    return null;
+                };
+
+                const firstRow = json[0];
+                const matchedRollKey = findRollNumberKey(firstRow);
+                const matchedNameKey = findNameKey(firstRow);
+
+                // Fall back to first column designator for roll and second for name if headers don't match pattern
+                const rollKey = matchedRollKey || Object.keys(firstRow)[0];
+                const nameKey = matchedNameKey || Object.keys(firstRow)[1];
+
+                if (rollKey && nameKey && rollKey !== nameKey) {
+                    const newStudents = json.map(item => {
+                        const rollVal = String(item[rollKey] ?? '').trim();
+                        const nameVal = String(item[nameKey] ?? '').trim();
+                        return {
+                            rollNumber: rollVal,
+                            name: nameVal
+                        };
+                    }).filter(s => s.rollNumber && s.name && s.name.toLowerCase() !== 'name' && s.rollNumber.toLowerCase() !== 'rollnumber');
+
+                    if (newStudents.length === 0) {
+                        toast({ variant: 'destructive', title: 'Invalid Data', description: 'Could not parse any valid student rows (values for Roll and Name are required).' });
+                        return;
+                    }
+
                     const result = addStudentsToClass(selectedClass, newStudents);
 
                     toast({
                         title: 'Import Complete',
-                        description: `${result.added} students were added. ${result.skipped} were skipped as duplicates.`,
+                        description: `Successfully added ${result.added} students to ${selectedClass}. ${result.skipped} duplicates were ignored.`,
                     });
                     onStudentsImported();
                     setIsOpen(false);
                     setFile(null);
                 } else {
-                    toast({ variant: 'destructive', title: 'Invalid File Format', description: 'The Excel file must have "rollNumber" and "name" columns.' });
+                    toast({
+                        variant: 'destructive',
+                        title: 'Invalid Format',
+                        description: `Could not find distinct Roll Number and Student Name columns. Identified: "${rollKey}" & "${nameKey}". Please check your Excel headers.`,
+                    });
                 }
             } catch (error) {
                 console.error("Import error:", error);
@@ -399,26 +457,31 @@ function ImportStudentsDialog({ course, selectedClass, onStudentsImported }: { c
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">
-                    <FileUp className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="shadow-sm hover:shadow-md transition-shadow">
+                    <FileUp className="mr-2 h-4 w-4 text-indigo-400" />
                     Import Students
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[450px]">
                 <DialogHeader>
-                    <DialogTitle>Import Students for {selectedClass}</DialogTitle>
-                    <DialogDescription>
-                        Upload an Excel (.xlsx, .xls) file with student information. Ensure the file has columns named "rollNumber" and "name".
+                    <DialogTitle>Import Students via Excel</DialogTitle>
+                    <DialogDescription className="text-muted-foreground pt-1.5">
+                        Upload any Excel sheet (.xlsx, .xls) containing student records. The system will auto-detect columns matching <strong className="text-white">Roll Number / ID</strong> and <strong className="text-white">Student Name</strong> values.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="py-4">
-                    <Label htmlFor="student-file">Excel File</Label>
-                    <Input id="student-file" type="file" onChange={handleFileChange} accept=".xlsx, .xls" />
+                <div className="py-5 space-y-4">
+                    <div className="rounded-lg p-3 bg-indigo-500/10 border border-indigo-500/25 text-xs text-indigo-300">
+                        💡 <strong>Flexible headers:</strong> You can use standard headers like <code className="bg-slate-900 px-1 py-0.5 rounded text-white">Roll Number</code>, <code className="bg-slate-900 px-1 py-0.5 rounded text-white">ID</code>, or <code className="bg-slate-900 px-1 py-0.5 rounded text-white">Admission No</code> for IDs, and <code className="bg-slate-900 px-1 py-0.5 rounded text-white">Name</code> or <code className="bg-slate-900 px-1 py-0.5 rounded text-white">Student Name</code> for names.
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="student-file" className="text-sm font-semibold">Select Excel Document</Label>
+                        <Input id="student-file" type="file" onChange={handleFileChange} accept=".xlsx, .xls" className="h-10 dark:bg-muted" />
+                    </div>
                 </div>
-                <DialogFooter>
-                    <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
-                    <Button onClick={handleImport} disabled={!file || isImporting}>
-                        {isImporting ? 'Importing...' : 'Import'}
+                <DialogFooter className="gap-2 sm:gap-0">
+                    <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
+                    <Button onClick={handleImport} disabled={!file || isImporting} className="bg-indigo-600 hover:bg-indigo-500 text-white min-w-[100px]">
+                        {isImporting ? 'Importing...' : 'Import Now'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

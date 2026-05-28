@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
+import { ThemeToggle } from '../theme-toggle';
 
 const facultyNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -49,7 +50,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   if (isLoading || !user) {
     return (
-      <div className="flex h-screen bg-slate-950">
+      <div className="flex h-screen bg-background">
         <Skeleton className="hidden md:block w-64 h-full" />
         <div className="flex-1 p-8">
             <Skeleton className="h-full w-full" />
@@ -67,13 +68,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <SidebarProvider>
-      <div className="flex flex-col md:flex-row min-h-screen w-full bg-slate-950 text-slate-200">
+      <div className="flex flex-col md:flex-row min-h-screen w-full bg-background text-foreground">
         
         {/* Mobile Navbar with horizontal scrolling items */}
-        <div className="sticky top-0 z-50 md:hidden bg-slate-900/95 backdrop-blur-md border-b border-slate-800 w-full flex flex-col">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/50">
+        <div className="sticky top-0 z-50 md:hidden bg-background/95 backdrop-blur-md border-b w-full flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
             <Logo />
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Link href="/profile" className="focus:outline-none">
                 <Avatar className="h-8 w-8 ring-2 ring-indigo-500/20 hover:ring-indigo-500/50 transition-all">
                   <AvatarImage src={user.avatarUrl} alt={user.name} />
@@ -85,7 +87,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg" 
+                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg" 
                 onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4" />
@@ -94,7 +96,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </div>
           
           {/* Scrollable category pills on mobile */}
-          <div className="flex overflow-x-auto whitespace-nowrap px-4 py-2 gap-2 scrollbar-none [&::-webkit-scrollbar]:hidden bg-slate-950/20">
+          <div className="flex overflow-x-auto whitespace-nowrap px-4 py-2 gap-2 scrollbar-none [&::-webkit-scrollbar]:hidden bg-muted/20">
             {navItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/profile" && pathname.startsWith(item.href));
               return (
@@ -105,7 +107,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all shrink-0 border",
                     isActive 
                       ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20" 
-                      : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800"
+                      : "bg-background border-border text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
                   <item.icon className="h-3.5 w-3.5" />
@@ -117,16 +119,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Desktop Sidebar (Only visible on wide screens) */}
-        <Sidebar className="hidden md:flex flex-col border-r border-slate-800 bg-slate-900">
+        <Sidebar className="hidden md:flex flex-col border-r bg-card">
             <SidebarNav user={user} />
         </Sidebar>
 
         {/* Core Main Area */}
-        <SidebarInset className="bg-slate-950 flex flex-col flex-1 overflow-x-hidden min-h-screen">
+        <SidebarInset className="bg-background flex flex-col flex-1 overflow-x-hidden min-h-screen">
           <main className="flex-1 w-full">
             {children}
           </main>
-          <footer className="p-6 text-center text-xs text-slate-500 font-medium uppercase tracking-widest border-t border-slate-900 bg-slate-950">
+          <footer className="p-6 text-center text-xs text-muted-foreground font-medium uppercase tracking-widest border-t bg-background">
             © 2026 AttendEase Attendance tracking. All rights reserved.
           </footer>
         </SidebarInset>

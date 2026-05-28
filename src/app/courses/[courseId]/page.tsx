@@ -7,9 +7,9 @@ import CourseDetailContent from './course-detail-content';
 export default async function CourseDetailPage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) {
-  const courseId = params.courseId;
+  const { courseId } = await params;
   const courses = getCourses();
   const course = courses.find(c => c.id === courseId);
 

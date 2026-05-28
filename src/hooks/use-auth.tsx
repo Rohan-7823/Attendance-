@@ -8,7 +8,7 @@ import type { User, Role } from '@/lib/types';
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string, role: Role) => boolean;
+  login: (email: string, password: string, role: Role) => { success: boolean, error?: string };
   logout: () => void;
   register: (data: Omit<User, 'id' | 'avatarUrl'|'attendance'>) => boolean;
   updateProfile: (updatedData: Partial<User>) => void;
@@ -29,7 +29,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsed = JSON.parse(storedUser);
+        // Refresh check against latest approved state
+        const freshUser = allUsers.find(u => u.id === parsed.id);
+        if (freshUser) {
+          setUser(freshUser);
+          localStorage.setItem('user', JSON.stringify(freshUser));
+        } else {
+          setUser(parsed);
+        }
       } catch (error) {
         console.error("Failed to parse user from localStorage", error);
         localStorage.removeItem('user');
@@ -38,17 +46,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (email: string, password: string, role: Role): boolean => {
+  const login = (email: string, password: string, role: Role): { success: boolean, error?: string } => {
     const allUsers = getUsers();
     const foundUser = allUsers.find(
       (u) => u.email === email && u.password === password && u.role === role
     );
     if (foundUser) {
+      if (foundUser.role === 'faculty') {
+        const isApproved = foundUser.isApproved === true;
+        if (!isApproved) {
+          return {
+            success: false,
+            error: "Your faculty account is pending approval from the Super Admin. Please contact administration."
+          };
+        }
+      }
       setUser(foundUser);
       localStorage.setItem('user', JSON.stringify(foundUser));
-      return true;
+      return { success: true };
     }
-    return false;
+    return { success: false, error: "Invalid email or password for the selected role." };
   };
 
   const register = (data: Omit<User, 'id' | 'avatarUrl' | 'attendance' >): boolean => {
@@ -59,10 +76,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return false;
     }
 
+    const isFaculty = data.role === 'faculty';
     const newUser: User = {
         id: `user${allUsers.length + 1}`,
         ...data,
-        avatarUrl: `https://placehold.co/100x100.png`
+        avatarUrl: `https://placehold.co/100x100.png`,
+        isApproved: isFaculty ? false : true,
+        status: isFaculty ? 'pending' : 'active'
     };
     
     const updatedUsers = [...allUsers, newUser];

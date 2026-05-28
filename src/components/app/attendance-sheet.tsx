@@ -21,7 +21,7 @@ export function AttendanceSheet({ students, attendance, onAttendanceChange, onSe
   };
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border shadow-sm bg-card">
         <div className="p-2 border-b">
             <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={() => onSelectAll(true)}>Mark All Present</Button>

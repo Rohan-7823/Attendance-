@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -41,16 +41,23 @@ import { Logo } from "@/components/app/logo";
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  role: z.enum(["student", "faculty"], { required_error: "You must select a role." }),
+  role: z.enum(["student", "faculty", "admin", "superadmin"], { required_error: "You must select a role." }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { user, isLoading: authLoading, login } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace("/dashboard");
+    }
+  }, [user, authLoading, router]);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -63,8 +70,8 @@ export default function LoginPage() {
   const onSubmit = (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      const success = login(data.email, data.password, data.role);
-      if (success) {
+      const result = login(data.email, data.password, data.role);
+      if (result.success) {
         toast({
           title: "Login Successful",
           description: "Redirecting to your dashboard...",
@@ -74,7 +81,7 @@ export default function LoginPage() {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Invalid email or password for the selected role.",
+          description: result.error || "Invalid email or password for the selected role.",
         });
       }
     } catch (error) {
@@ -149,6 +156,8 @@ export default function LoginPage() {
                         <SelectContent>
                           <SelectItem value="student">Student</SelectItem>
                           <SelectItem value="faculty">Faculty</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="superadmin">Super Admin</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

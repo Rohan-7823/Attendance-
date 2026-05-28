@@ -4,23 +4,36 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getCourses } from "@/lib/data";
+import { getCourses, deleteCourse } from "@/lib/data";
 import type { Course } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from 'next/image';
-import { ArrowRight, PlusCircle } from "lucide-react";
+import { ArrowRight, PlusCircle, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CoursesPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
     setCourses(getCourses());
   }, []);
+
+  const handleDelete = (courseId: string, courseName: string) => {
+    if (confirm(`Are you sure you want to delete "${courseName}"?`)) {
+      deleteCourse(courseId);
+      setCourses(getCourses());
+      toast({
+        title: "Course Deleted",
+        description: `"${courseName}" has been removed successfully.`,
+      });
+    }
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -56,12 +69,22 @@ export default function CoursesPage() {
                 {course.description}
               </p>
             </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
+            <CardFooter className="flex gap-2">
+              <Button asChild className="flex-1">
                 <Link href={`/courses/${course.id}`}>
-                  View Details <ArrowRight className="ml-2 h-4 w-4" />
+                  View <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
+              {user?.role === 'faculty' && (
+                <Button 
+                  variant="destructive" 
+                  size="icon"
+                  onClick={() => handleDelete(course.id, course.name)}
+                  title="Delete Course"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
             </CardFooter>
           </Card>
         ))}

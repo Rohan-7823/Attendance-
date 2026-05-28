@@ -163,12 +163,12 @@ export default function ProfilePage() {
     <div id="profile-container" className="flex-1 space-y-8 p-4 md:p-8 max-w-5xl mx-auto pt-6 pb-20">
       
       {/* Upper header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white mb-1">Account & Profile Settings</h1>
-          <p className="text-slate-400 text-sm">Update your digital representation, contact details, and account security controls.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground mb-1">Account & Profile Settings</h1>
+          <p className="text-muted-foreground text-sm">Update your digital representation, contact details, and account security controls.</p>
         </div>
-        <Button variant="outline" className="gap-2 border-slate-800 hover:bg-slate-900 text-slate-300" onClick={() => router.back()}>
+        <Button variant="outline" className="gap-2" onClick={() => router.back()}>
           <Undo2 className="h-4 w-4" />
           <span>Back</span>
         </Button>
@@ -178,15 +178,15 @@ export default function ProfilePage() {
         
         {/* Left Column - Card Summary */}
         <div className="space-y-6 lg:col-span-1">
-          <Card className="bg-slate-900 border-slate-800 text-slate-200 shadow-xl overflow-hidden">
+          <Card className="shadow-xl overflow-hidden">
             <div className="h-24 bg-gradient-to-r from-indigo-700 to-indigo-950 relative">
-              <Badge className="absolute top-4 right-4 bg-indigo-600 border-0 hover:bg-indigo-500 text-xs font-semibold capitalize px-3 py-1">
+              <Badge className="absolute top-4 right-4 bg-indigo-600 border-0 hover:bg-indigo-500 text-xs font-semibold capitalize px-3 py-1 text-white">
                 {user.role}
               </Badge>
             </div>
-            <CardContent className="pt-0 relative flex flex-col items-center text-center pb-8 border-b border-slate-800/50">
+            <CardContent className="pt-0 relative flex flex-col items-center text-center pb-8 border-b">
               <div className="relative -mt-12 mb-4">
-                <Avatar className="h-24 w-24 border-4 border-slate-900 shadow-xl">
+                <Avatar className="h-24 w-24 border-4 border-background shadow-xl">
                   <AvatarImage src={avatarUrl} alt={name} />
                   <AvatarFallback className="bg-indigo-700 text-white font-bold text-2xl">
                     {name ? name.charAt(0).toUpperCase() : "U"}
@@ -194,25 +194,25 @@ export default function ProfilePage() {
                 </Avatar>
               </div>
               
-              <h3 className="text-xl font-bold text-white mb-1">{name || "User Name"}</h3>
-              <p className="text-sm text-slate-400 font-mono mb-4">{email || "email@example.com"}</p>
+              <h3 className="text-xl font-bold text-foreground mb-1">{name || "User Name"}</h3>
+              <p className="text-sm text-muted-foreground font-mono mb-4">{email || "email@example.com"}</p>
               
-              <div className="grid grid-cols-1 gap-2 w-full text-left bg-slate-950/40 p-3 rounded-xl border border-slate-800">
-                <div className="flex items-center gap-2 text-xs text-slate-400">
+              <div className="grid grid-cols-1 gap-2 w-full text-left bg-muted/40 p-3 rounded-xl border">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Building2 className="h-3.5 w-3.5 text-indigo-400" />
-                  <span className="font-semibold text-slate-300">Department:</span>
+                  <span className="font-semibold text-foreground">Department:</span>
                   <span className="ml-auto">{department || "Not Specified"}</span>
                 </div>
                 {user.role === "student" && (
                   <>
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <GraduationCap className="h-3.5 w-3.5 text-indigo-400" />
-                      <span className="font-semibold text-slate-300">Class:</span>
+                      <span className="font-semibold text-foreground">Class:</span>
                       <span className="ml-auto">{className || "Not Specified"}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Clock className="h-3.5 w-3.5 text-indigo-400" />
-                      <span className="font-semibold text-slate-300">Roll No:</span>
+                      <span className="font-semibold text-foreground">Roll No:</span>
                       <span className="ml-auto">{rollNumber || "Not Specified"}</span>
                     </div>
                   </>
@@ -220,8 +220,8 @@ export default function ProfilePage() {
               </div>
             </CardContent>
 
-            <CardFooter className="p-4 bg-slate-950/20 flex flex-col items-stretch space-y-4">
-              <Label className="text-xs text-slate-400 font-semibold tracking-wider uppercase mb-1">Choose Avatar Picture</Label>
+            <CardFooter className="p-4 bg-muted/20 flex flex-col items-stretch space-y-4">
+              <Label className="text-xs text-muted-foreground font-semibold tracking-wider uppercase mb-1">Choose Avatar Picture</Label>
               <div className="grid grid-cols-6 gap-2">
                 {AVATAR_PRESETS.map((url, idx) => (
                   <button
@@ -229,7 +229,7 @@ export default function ProfilePage() {
                     type="button"
                     onClick={() => setAvatarUrl(url)}
                     className={`relative rounded-md overflow-hidden aspect-square border-2 transition-all ${
-                      avatarUrl === url ? "border-indigo-500 scale-105" : "border-transparent hover:border-slate-700"
+                      avatarUrl === url ? "border-indigo-500 scale-105" : "border-transparent hover:border-muted-foreground/30"
                     }`}
                   >
                     <img src={url} alt={`Preset ${idx + 1}`} className="w-full h-full object-cover" />
@@ -250,35 +250,33 @@ export default function ProfilePage() {
           
           {/* Main Edit Form */}
           <form onSubmit={handleSaveProfile}>
-            <Card className="bg-slate-900 border-slate-800 text-slate-200 shadow-xl">
-              <CardHeader className="border-b border-slate-800/50 pb-4">
-                <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+            <Card className="shadow-xl">
+              <CardHeader className="border-b pb-4">
+                <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
                   <UserIcon className="h-5 w-5 text-indigo-400" />
                   <span>Personal Details</span>
                 </CardTitle>
-                <CardDescription className="text-slate-400">Modify your visual profiles and communication details</CardDescription>
+                <CardDescription>Modify your visual profiles and communication details</CardDescription>
               </CardHeader>
 
               <CardContent className="space-y-6 pt-6">
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-slate-300 font-medium">Full Name</Label>
+                    <Label htmlFor="name" className="text-foreground font-medium">Full Name</Label>
                     <Input 
                       id="name"
                       type="text"
-                      className="bg-slate-950 border-slate-800 text-slate-200 focus:ring-indigo-500 focus:border-indigo-500"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Jane Doe"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-slate-300 font-medium">Email Address</Label>
+                    <Label htmlFor="email" className="text-foreground font-medium">Email Address</Label>
                     <Input 
                       id="email"
                       type="email"
-                      className="bg-slate-950 border-slate-800 text-slate-200 focus:ring-indigo-500 focus:border-indigo-500"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="jane@uni.edu"
@@ -288,15 +286,15 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="mobile" className="text-slate-300 font-medium">Contact Number</Label>
+                    <Label htmlFor="mobile" className="text-foreground font-medium">Contact Number</Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-slate-500 text-sm">
+                      <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">
                         <Phone className="h-4 w-4" />
                       </span>
                       <Input 
                         id="mobile"
                         type="tel"
-                        className="pl-10 bg-slate-950 border-slate-800 text-slate-200 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="pl-10"
                         value={mobileNumber}
                         onChange={(e) => setMobileNumber(e.target.value)}
                         placeholder="9876543210"
@@ -304,11 +302,10 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="department" className="text-slate-300 font-medium">Academic Department</Label>
+                    <Label htmlFor="department" className="text-foreground font-medium">Academic Department</Label>
                     <Input 
                       id="department"
                       type="text"
-                      className="bg-slate-950 border-slate-800 text-slate-200 focus:ring-indigo-500 focus:border-indigo-500"
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
                       placeholder="Computer Science & Engineering"
@@ -317,30 +314,28 @@ export default function ProfilePage() {
                 </div>
 
                 {user.role === "student" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950/30 p-4 rounded-xl border border-slate-800/60">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-4 rounded-xl border">
                     <div className="space-y-2">
-                      <Label htmlFor="class" className="text-indigo-400 font-medium flex items-center gap-1">
+                      <Label htmlFor="class" className="text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1">
                         <GraduationCap className="h-4 w-4" />
                         <span>Class Section</span>
                       </Label>
                       <Input 
                         id="class"
                         type="text"
-                        className="bg-slate-950 border-slate-800 text-slate-200 focus:ring-indigo-500"
                         value={className}
                         onChange={(e) => setClassName(e.target.value)}
                         placeholder="SE CSE A"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="roll" className="text-indigo-400 font-medium flex items-center gap-1">
+                      <Label htmlFor="roll" className="text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         <span>Roll Number</span>
                       </Label>
                       <Input 
                         id="roll"
                         type="text"
-                        className="bg-slate-950 border-slate-800 text-slate-200 focus:ring-indigo-500"
                         value={rollNumber}
                         onChange={(e) => setRollNumber(e.target.value)}
                         placeholder="2"
@@ -350,11 +345,10 @@ export default function ProfilePage() {
                 )}
                 
                 <div className="space-y-2">
-                  <Label htmlFor="avatar-custom" className="text-slate-300 font-medium">Custom Avatar URL</Label>
+                  <Label htmlFor="avatar-custom" className="text-foreground font-medium">Custom Avatar URL</Label>
                   <Input 
                     id="avatar-custom"
                     type="url"
-                    className="bg-slate-950 border-slate-800 text-slate-200 focus:ring-indigo-500"
                     value={avatarUrl}
                     onChange={(e) => setAvatarUrl(e.target.value)}
                     placeholder="https://example.com/avatar.jpg"
@@ -363,7 +357,7 @@ export default function ProfilePage() {
 
               </CardContent>
 
-              <CardFooter className="border-t border-slate-800/50 p-6 flex justify-end gap-2">
+              <CardFooter className="border-t p-6 flex justify-end gap-2">
                 <Button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors px-6 gap-2">
                   <Save className="h-4 w-4" />
                   <span>Save Changes</span>
@@ -373,16 +367,16 @@ export default function ProfilePage() {
           </form>
 
           {/* Change Password Card */}
-          <Card className="bg-slate-900 border-slate-800 text-slate-200 shadow-xl overflow-hidden">
-            <CardHeader className="cursor-pointer select-none hover:bg-slate-800/30 transition-all border-b border-indigo-950 px-6 py-4 flex flex-row items-center justify-between" onClick={() => setIsChangingPassword(!isChangingPassword)}>
+          <Card className="shadow-xl overflow-hidden">
+            <CardHeader className="cursor-pointer select-none hover:bg-muted/50 transition-all border-b px-6 py-4 flex flex-row items-center justify-between" onClick={() => setIsChangingPassword(!isChangingPassword)}>
               <div className="space-y-1">
-                <CardTitle className="text-md font-bold text-white flex items-center gap-2">
+                <CardTitle className="text-md font-bold text-foreground flex items-center gap-2">
                   <KeyRound className="h-5 w-5 text-indigo-400" />
                   <span>Security & Password</span>
                 </CardTitle>
-                <CardDescription className="text-slate-400">Keep your login credentials securely updated</CardDescription>
+                <CardDescription>Keep your login credentials securely updated</CardDescription>
               </div>
-              <Button type="button" variant="ghost" className="text-indigo-400 hover:text-white hover:bg-slate-800">
+              <Button type="button" variant="ghost" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-white">
                 {isChangingPassword ? "Hide" : "Expand Fields"}
               </Button>
             </CardHeader>
@@ -391,11 +385,10 @@ export default function ProfilePage() {
               <form onSubmit={handleUpdatePassword}>
                 <CardContent className="space-y-4 pt-6 px-6">
                   <div className="space-y-2">
-                    <Label htmlFor="current-pass" className="text-slate-300">Current Password</Label>
+                    <Label htmlFor="current-pass">Current Password</Label>
                     <Input 
                       id="current-pass"
                       type="password"
-                      className="bg-slate-950 border-slate-800 text-slate-200"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
@@ -403,11 +396,10 @@ export default function ProfilePage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="new-pass" className="text-slate-300">New Password</Label>
+                      <Label htmlFor="new-pass">New Password</Label>
                       <Input 
                         id="new-pass"
                         type="password"
-                        className="bg-slate-950 border-slate-800 text-slate-200"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="At least 6 chars"
@@ -415,11 +407,10 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="confirm-pass" className="text-slate-300">Confirm New Password</Label>
+                      <Label htmlFor="confirm-pass">Confirm New Password</Label>
                       <Input 
                         id="confirm-pass"
                         type="password"
-                        className="bg-slate-950 border-slate-800 text-slate-200"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
@@ -427,7 +418,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="border-t border-slate-800/50 p-6 flex justify-end">
+                <CardFooter className="border-t p-6 flex justify-end">
                   <Button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold gap-2">
                     <Check className="h-4 w-4" />
                     <span>Apply New Password</span>

@@ -15,7 +15,7 @@ import { UserNav } from "./user-nav";
 import { Separator } from "../ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import type { User } from "@/lib/types";
-import { LayoutDashboard, BookCheck, BookUser, LogOut, BookCopy, FileText, User as UserIcon } from "lucide-react";
+import { LayoutDashboard, BookCheck, BookUser, LogOut, BookCopy, FileText, User as UserIcon, GraduationCap } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
@@ -35,12 +35,25 @@ const studentNavItems = [
   { href: "/profile", icon: UserIcon, label: "My Profile" },
 ];
 
+const superadminNavItems = [
+  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/admin/faculty", icon: GraduationCap, label: "Verify Faculty" },
+  { href: "/courses", icon: BookUser, label: "Course Control" },
+  { href: "/reports", icon: FileText, label: "Global reports" },
+  { href: "/profile", icon: UserIcon, label: "System Admin" },
+];
+
 export function SidebarNav({ user }: { user: User }) {
   const pathname = usePathname();
   const { logout } = useAuth();
   const router = useRouter();
 
-  const navItems = user.role === 'faculty' ? facultyNavItems : studentNavItems;
+  const navItems = 
+    user.role === 'superadmin' || user.role === 'admin'
+      ? superadminNavItems
+      : user.role === 'faculty'
+      ? facultyNavItems
+      : studentNavItems;
 
   const handleLogout = () => {
     logout();
