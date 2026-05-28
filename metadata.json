@@ -1,0 +1,6 @@
+{
+  "name": "AttendEase",
+  "description": "An automated attendance tracking and management system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
